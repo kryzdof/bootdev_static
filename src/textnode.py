@@ -37,3 +37,6 @@ class TextNode:
                 return LeafNode(self.text_type.value, self.text, {"href": self.url})
         return LeafNode(self.text_type.value, self.text, self.url)
 
+    def to_html(self):
+        return self.to_LeafNode().to_html()
+

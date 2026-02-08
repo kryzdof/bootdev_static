@@ -1,7 +1,8 @@
 import re
 from enum import Enum
 from textnode import TextNode, TextType
-
+from parentnode import ParentNode
+from leafnode import LeafNode
 
 class BlockType(Enum):
     PARAGRAPH = "p"
@@ -24,7 +25,7 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
             for i, s in enumerate(splitted):
                 if i % 2:
                     new_nodes.append(TextNode(s, text_type))
-                else:
+                elif s:
                     new_nodes.append(TextNode(s, TextType.TEXT))
     return new_nodes
 
@@ -131,4 +132,36 @@ def get_block_type(block: str):
     if linestarts.count("+") == len(linestarts):
         return BlockType.ORDERED_LIST
 
-def markdown_to_html(markdown: str) -> 
+
+def markdown_to_html(markdown: str) -> ParentNode:
+    blocks = markdown_to_blocks(markdown)
+    top_children = []
+    for block in blocks:
+        BlockType
+        match get_block_type(block):
+            case BlockType.PARAGRAPH:
+                top_children.append(ParentNode("p", text_to_textnodes(block.replace("\n", " "))))
+            case BlockType.HEADING:
+                heading_level = len(block.split(" ")[0])
+                top_children.append(ParentNode(f"h{heading_level}", text_to_textnodes(block.lstrip("# "))))
+            case BlockType.CODE:
+                codenode = LeafNode("code", block.split("\n",1)[1].rstrip("`"))
+                top_children.append(ParentNode("pre", [codenode]))
+            case BlockType.QUOTE:
+                lines = []
+                for line in block.splitlines():
+                    lines.append(line[1:])
+                top_children.append(ParentNode("blockquote", text_to_textnodes("\n".join(lines))))
+            case BlockType.UNORDERED_LIST:
+                nodes = []
+                for line in block.splitlines():
+                    nodes.append(ParentNode("li", text_to_textnodes(line[2:])))
+                top_children.append(ParentNode("ul", nodes))
+            case BlockType.ORDERED_LIST:
+                nodes = []
+                for line in block.splitlines():
+                    nodes.append(ParentNode("li", text_to_textnodes(line.split(". ", 1)[1])))
+                top_children.append(ParentNode("ol", nodes))
+
+    top = ParentNode("div", top_children)
+    return top.to_html()

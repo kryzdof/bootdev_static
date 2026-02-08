@@ -8,8 +8,21 @@ print(htmlnode.HTMLNode("p", "some text", None, {
 }))
 
 old_nodes = [textnode.TextNode("Ein text mit **fettem** Zeug", textnode.TextType.TEXT)]
-
 print(converter.split_nodes_delimiter(old_nodes, "**", textnode.TextType.BOLD))
 
-text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
-print(converter.extract_markdown_images(text))
+
+md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+html = converter.markdown_to_html(md)
+print("\n\n\n")
+print("-----")
+print(html)
+
+blocks = converter.markdown_to_blocks(md)
+print(blocks)
+
