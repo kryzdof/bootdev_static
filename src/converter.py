@@ -1,5 +1,16 @@
 import re
+from enum import Enum
 from textnode import TextNode, TextType
+
+
+class BlockType(Enum):
+    PARAGRAPH = "p"
+    HEADING = "h"
+    CODE = "code"
+    QUOTE = "blockquote"
+    UNORDERED_LIST = "ul"
+    ORDERED_LIST = "ol"
+
 
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
     new_nodes = []
@@ -88,9 +99,36 @@ def text_to_textnodes(text: str) -> list[TextNode]:
     return nodes
 
 
-def markdown_to_blocks(markdown):
+def markdown_to_blocks(markdown: str) -> list[str]:
     blocks = []
     for block in markdown.split("\n\n"):
         if block.strip():
             blocks.append(block.strip())
     return blocks
+
+
+def get_block_type(block: str):
+    if re.findall(r"^#{1,6} ", block):
+        return BlockType.HEADING
+    if block.startswith("```\n") and block.endswith("```"):
+        return BlockType.CODE
+    linestarts = []
+    for i, l in enumerate(block.splitlines()):
+        if l.startswith(">"):
+            linestarts.append(">")
+        elif l.startswith("- "):
+            linestarts.append("-")
+        elif re.findall(rf"^{i+1}. ", l):
+            linestarts.append("+")
+        else:
+            linestarts.append("n")
+    if linestarts.count("n"):
+        return BlockType.PARAGRAPH
+    if linestarts.count(">") == len(linestarts):
+        return BlockType.QUOTE
+    if linestarts.count("-") == len(linestarts):
+        return BlockType.UNORDERED_LIST
+    if linestarts.count("+") == len(linestarts):
+        return BlockType.ORDERED_LIST
+
+def markdown_to_html(markdown: str) -> 

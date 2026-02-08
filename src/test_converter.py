@@ -274,5 +274,31 @@ This is the same paragraph on a new line
             ],
         )
 
+    def test_heading_blocks(self):
+        self.assertEqual(converter.get_block_type("# test"), converter.BlockType.HEADING)
+        self.assertEqual(converter.get_block_type("## test"), converter.BlockType.HEADING)
+        self.assertEqual(converter.get_block_type("### test"), converter.BlockType.HEADING)
+        self.assertEqual(converter.get_block_type("#### test"), converter.BlockType.HEADING)
+        self.assertEqual(converter.get_block_type("##### test"), converter.BlockType.HEADING)
+        self.assertEqual(converter.get_block_type("###### test"), converter.BlockType.HEADING)
+        self.assertEqual(converter.get_block_type("####### test"), converter.BlockType.PARAGRAPH)
+
+    def test_code_blocks(self):
+        self.assertEqual(converter.get_block_type("```\ncode\n```"), converter.BlockType.CODE)
+        self.assertEqual(converter.get_block_type("```\ncode```"), converter.BlockType.CODE)
+
+    def test_quote_blocks(self):
+        self.assertEqual(converter.get_block_type(">test\n>no"), converter.BlockType.QUOTE)
+        self.assertEqual(converter.get_block_type(">\n>"), converter.BlockType.QUOTE)
+
+    def test_quote_ol(self):
+        self.assertEqual(converter.get_block_type("1. test\n2. no"), converter.BlockType.ORDERED_LIST)
+        self.assertEqual(converter.get_block_type("1. \n2. \n3. \n4. "), converter.BlockType.ORDERED_LIST)
+
+    def test_quote_ul(self):
+        self.assertEqual(converter.get_block_type("- test\n- no"), converter.BlockType.UNORDERED_LIST)
+        self.assertEqual(converter.get_block_type("- \n- "), converter.BlockType.UNORDERED_LIST)
+    
+
 if __name__ == "__main__":
     unittest.main()
