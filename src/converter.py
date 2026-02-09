@@ -133,7 +133,7 @@ def get_block_type(block: str):
         return BlockType.ORDERED_LIST
 
 
-def markdown_to_html(markdown: str) -> ParentNode:
+def markdown_to_html(markdown: str) -> str:
     blocks = markdown_to_blocks(markdown)
     top_children = []
     for block in blocks:
@@ -150,7 +150,7 @@ def markdown_to_html(markdown: str) -> ParentNode:
             case BlockType.QUOTE:
                 lines = []
                 for line in block.splitlines():
-                    lines.append(line[1:])
+                    lines.append(line[1:].strip())
                 top_children.append(ParentNode("blockquote", text_to_textnodes("\n".join(lines))))
             case BlockType.UNORDERED_LIST:
                 nodes = []
