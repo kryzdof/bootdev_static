@@ -72,10 +72,10 @@ if __name__ == "__main__":
         basepath = "/"
     removeDir("doc")
     removeDir("public")
-    copyDir("static", "doc")
+    copyDir("static", "docs")
     for p, folders, files in os.walk("content"):
         for f in files:
             if f.endswith(".md"):
                 generate_page(os.path.join(p, f), "template.html",
-                              os.path.join(p.replace("content", "doc"), f.replace(".md", ".html")), basepath)
+                              os.path.join(p.replace("content", "docs"), f.replace(".md", ".html")), basepath)
 
