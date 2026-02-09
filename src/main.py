@@ -1,4 +1,4 @@
-import os, shutil, re
+import os, shutil, sys, re
 from converter import markdown_to_html
 
 def removeDir(directory):
@@ -37,7 +37,7 @@ def extract_title(markdown):
         raise AttributeError("No title found")
     return titles[0][2:]
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     from_path = os.path.abspath(from_path)
     template_path = os.path.abspath(template_path)
     dest_path = os.path.abspath(dest_path)
@@ -56,18 +56,25 @@ def generate_page(from_path, template_path, dest_path):
     title = extract_title(markdown)
     template_html = template_html.replace("{{ Title }}", title)
     template_html = template_html.replace("{{ Content }}", html)
+    template_html = template_html.replace('href="/', f'href="{basepath}')
+    template_html = template_html.replace('src="/', f'src="{basepath}')
     
+
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     with open(dest_path, "wt") as f:
         f.write(template_html)
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+    else:
+        basepath = "/"
     removeDir("public")
     copyDir("static", "public")
     for p, folders, files in os.walk("content"):
         for f in files:
             if f.endswith(".md"):
                 generate_page(os.path.join(p, f), "template.html",
-                              os.path.join(p.replace("content", "public"), f.replace(".md", ".html")))
+                              os.path.join(p.replace("content", "public"), f.replace(".md", ".html")), basepath)
 
