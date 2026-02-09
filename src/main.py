@@ -56,7 +56,8 @@ def generate_page(from_path, template_path, dest_path):
     title = extract_title(markdown)
     template_html = template_html.replace("{{ Title }}", title)
     template_html = template_html.replace("{{ Content }}", html)
-
+    
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     with open(dest_path, "wt") as f:
         f.write(template_html)
 
@@ -64,5 +65,9 @@ def generate_page(from_path, template_path, dest_path):
 if __name__ == "__main__":
     removeDir("public")
     copyDir("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    for p, folders, files in os.walk("content"):
+        for f in files:
+            if f.endswith(".md"):
+                generate_page(os.path.join(p, f), "template.html",
+                              os.path.join(p.replace("content", "public"), f.replace(".md", ".html")))
 
