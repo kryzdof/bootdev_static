@@ -1,28 +1,37 @@
-import textnode, htmlnode, converter
+import os, shutil
 
-print(textnode.TextNode("Ein Text", textnode.TextType.TEXT))
+def removeDir(directory):
+    d = os.path.abspath(directory)
+    print(f"path to delete: {d}")
+    if os.path.exists(d) and os.path.isdir(d):
+        print(f"deleting {d}...")
+        shutil.rmtree(d, True)
+        print("deleted")
+    else:
+        print("path not found or not a directory")
 
-print(htmlnode.HTMLNode("p", "some text", None, {
-    "href": "https://www.google.com",
-    "target": "_blank",
-}))
+def copyDir(src, dest):
+    src = os.path.abspath(src)
+    dest = os.path.abspath(dest)
+    if os.path.exists(src):
+        if os.path.exists(dest):
+            print(f"dest '{dest}' already exists")
+            return
+        else:
+            if os.path.isdir(src):
+                print(f"creating destination folder '{dest}'")
+                os.mkdir(dest)
+                for file in os.listdir(src):
+                    copyDir(os.path.join(src, file), os.path.join(dest, file))
+            else:
+                print(f"copying file to '{dest}'")
+                shutil.copy(src,dest)
+                return
+    else:
+        print(f"src '{src}' does not exist - aborting")
 
-old_nodes = [textnode.TextNode("Ein text mit **fettem** Zeug", textnode.TextType.TEXT)]
-print(converter.split_nodes_delimiter(old_nodes, "**", textnode.TextType.BOLD))
 
-
-md = """
-```
-This is text that _should_ remain
-the **same** even with inline stuff
-```
-"""
-
-html = converter.markdown_to_html(md)
-print("\n\n\n")
-print("-----")
-print(html)
-
-blocks = converter.markdown_to_blocks(md)
-print(blocks)
+if __name__ == "__main__":
+    removeDir("public")
+    copyDir("static", "public")
 
